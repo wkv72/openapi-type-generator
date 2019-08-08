@@ -1,0 +1,35 @@
+{
+  "name": "openapi-type-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate": "openapi-generator generate -g typescript-node --additional-properties=\"$OPENAPI_TG_ADDITIONAL_PROPERTIES\" -i $OPENAPI_TG_INPUT -o $OPENAPI_TG_OUTPUT >/dev/null 2>/dev/null"
+  },
+  "bin": {
+    "openapi-tg": "./dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@manifoldco/swagger-to-ts": "^1.3.0",
+    "@types/minimist": "^1.2.0",
+    "@types/node": "^12.7.1",
+    "@types/ncp": "^2.0.1",
+    "@types/npm": "^2.0.30",
+    "@types/tmp": "^0.1.0",
+    "@types/yaml": "^1.0.2",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "0.0.16-4.0.3",
+    "dtsgenerator": "^2.2.0",
+    "minimist": "^1.2.0",
+    "ncp": "^2.0.0",
+    "npm": "^6.10.3",
+    "tmp": "^0.1.0",
+    "yaml": "^1.6.0"
+  }
+}
