@@ -20,9 +20,13 @@ if (!program.input) {
 }
 
 if (!program.output) {
-    // tslint:disable-next-line:no-console
     console.error("[Error] Required option '-o' is missing.");
-    process.exit(1);
+    process.exit(2);
+}
+
+if (!program.method) {
+    console.error("[Error] Required option '-m' is missing.");
+    process.exit(3);
 }
 
 let force = false;
@@ -65,6 +69,7 @@ async function main(): Promise<void> {
         );
     } catch (err) {
         console.log(err);
+        process.exit(4);
     }
 }
 
