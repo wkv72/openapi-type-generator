@@ -3,7 +3,9 @@
 import minimist = require("minimist");
 import path from "path";
 
-import {copyDir, fileExists, npmLoad, runScripts, tmpDir} from "./utils";
+import {copyDir, fileExists, tmpDir} from "./utils";
+
+import {spawn} from "child_process";
 
 const parsedArgs = minimist(process.argv.slice(2));
 
@@ -19,22 +21,20 @@ if (!parsedArgs.o) {
 }
 
 const inputFile = parsedArgs.i;
-const inputFileRelativeToCode = path.join(__dirname, "../", inputFile);
+const inputFileRelativeToCode = path.join(process.cwd(), inputFile);
+console.log(inputFileRelativeToCode);
 
 const outputDir = parsedArgs.o;
-const outputDirRelativeToCode = path.join(__dirname, "../", outputDir);
+const outputDirRelativeToCode = path.join(process.cwd(), outputDir);
+console.log(outputDirRelativeToCode);
 
 async function main(): Promise<void> {
-    const inputFileExists = await fileExists(inputFileRelativeToCode);
-
-    if (!inputFileExists) {
+    if (!await fileExists(inputFileRelativeToCode)) {
         console.error(`Input file '${inputFile}' does not exist.`);
         process.exit(2);
     }
 
-    const outputDirExists = await fileExists(outputDirRelativeToCode);
-
-    if (outputDirExists) {
+    if (await fileExists(outputDirRelativeToCode)) {
         console.error(`Output directory '${outputDir}' already exist.`);
         process.exit(3);
     }
@@ -45,8 +45,27 @@ async function main(): Promise<void> {
     process.env.OPENAPI_TG_OUTPUT = tempDir;
     process.env.OPENAPI_TG_ADDITIONAL_PROPERTIES = "supportsES6=true";
 
-    await npmLoad();
-    await runScripts(["generate"]);
+    const generate = spawn("openapi-generator", [
+        "generate",
+        "-g",
+        "typescript-node",
+        "-i",
+        `${inputFileRelativeToCode}`,
+        "-o",
+        `${outputDirRelativeToCode}`,
+    ]);
+
+    generate.stdout.on("data", (data) => {
+        // console.log(`stdout: ${data}`);
+    });
+
+    generate.stderr.on("data", (data) => {
+        // console.log(`stderr: ${data}`);
+    });
+
+    generate.on("close", (code) => {
+        console.log(`child process exited with code ${code}`);
+    });
 
     await copyDir(path.join(tempDir, "model"), outputDirRelativeToCode);
 }
