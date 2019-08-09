@@ -74,7 +74,7 @@ const validateSpecificationFile = (
             await execute(`${generatorBinary} validate -i ${inputFile}`);
             resolve();
         } catch (err) {
-            reject();
+            reject(err);
         }
     });
 };

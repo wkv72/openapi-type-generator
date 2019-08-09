@@ -81,7 +81,7 @@ const validateSpecificationFile = (generatorBinary, inputFile) => {
             resolve();
         }
         catch (err) {
-            reject();
+            reject(err);
         }
     }));
 };
