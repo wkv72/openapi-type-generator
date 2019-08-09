@@ -18,6 +18,12 @@ if (!parsedArgs.o) {
     process.exit(1);
 }
 
+let force = false;
+
+if (parsedArgs.f) {
+    force = true;
+}
+
 const inputFile = path.join(process.cwd(), parsedArgs.i);
 const outputDir = path.join(process.cwd(), parsedArgs.o);
 
@@ -28,7 +34,7 @@ async function main(): Promise<void> {
             process.exit(2);
         }
 
-        if (await fileExists(outputDir)) {
+        if (!force && await fileExists(outputDir)) {
             console.error(`Output directory '${outputDir}' already exist.`);
             process.exit(3);
         }
@@ -36,6 +42,8 @@ async function main(): Promise<void> {
         const tempDir = await createTempDir("openapi-tg");
 
         await execute(`openapi-generator generate -g typescript-node -i ${inputFile} -o ${tempDir}`);
+
+        await copyDir(path.join(tempDir, "model"), outputDir);
     } catch (err) {
         console.error(err);
     }

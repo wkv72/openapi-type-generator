@@ -25,6 +25,10 @@ if (!parsedArgs.o) {
     console.error("The -o argument is missing.");
     process.exit(1);
 }
+let force = false;
+if (parsedArgs.f) {
+    force = true;
+}
 const inputFile = path_1.default.join(process.cwd(), parsedArgs.i);
 const outputDir = path_1.default.join(process.cwd(), parsedArgs.o);
 function main() {
@@ -34,12 +38,13 @@ function main() {
                 console.error(`Input file '${inputFile}' does not exist.`);
                 process.exit(2);
             }
-            if (yield utils_1.fileExists(outputDir)) {
+            if (!force && (yield utils_1.fileExists(outputDir))) {
                 console.error(`Output directory '${outputDir}' already exist.`);
                 process.exit(3);
             }
             const tempDir = yield utils_1.createTempDir("openapi-tg");
             yield utils_1.execute(`openapi-generator generate -g typescript-node -i ${inputFile} -o ${tempDir}`);
+            yield utils_1.copyDir(path_1.default.join(tempDir, "model"), outputDir);
         }
         catch (err) {
             console.error(err);
