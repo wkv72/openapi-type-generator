@@ -19,7 +19,7 @@ const utils_1 = require("./utils");
 commander_1.default
     .option("-i, --input <file>", "input file")
     .option("-o, --output <directory>", "output file")
-    .option("-m, --method <name>", "method name")
+    .option("-m, --method <name>", "operationId of method to extract")
     .option("-f, --force", "overwrite existing output directory")
     .option("-v, --validate", "perform validation of input file");
 commander_1.default.parse(process.argv);
@@ -28,9 +28,12 @@ if (!commander_1.default.input) {
     process.exit(1);
 }
 if (!commander_1.default.output) {
-    // tslint:disable-next-line:no-console
     console.error("[Error] Required option '-o' is missing.");
-    process.exit(1);
+    process.exit(2);
+}
+if (!commander_1.default.method) {
+    console.error("[Error] Required option '-m' is missing.");
+    process.exit(3);
 }
 let force = false;
 if (commander_1.default.force) {
@@ -54,6 +57,7 @@ function main() {
         }
         catch (err) {
             console.log(err);
+            process.exit(4);
         }
     });
 }
