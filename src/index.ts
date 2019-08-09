@@ -48,7 +48,7 @@ if (program.validate) {
 const inputFile = path.join(process.cwd(), program.input);
 const outputDir = path.join(process.cwd(), program.output);
 
-const generatorBinary = `${__dirname}/node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator`;
+const generatorBinary = `${__dirname}/../../node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator`;
 
 async function main(): Promise<void> {
     try {
