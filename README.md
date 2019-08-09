@@ -8,4 +8,6 @@ Generates [TypeScript](https://www.typescriptlang.org/) type definition files fr
 
 ## Using
 
-`openapi-tg -i input.yml -o outdir`
+`openapi-tg -i input.yml -o outdir -m retrievePartyAccount -f -v`
+
+This will generate sources for the method with the operation ID `retrievePartyAccount`.

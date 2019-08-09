@@ -1,18 +1,25 @@
 #!/usr/bin/env node
 
-import minimist = require("minimist");
+import program from "commander";
 import path from "path";
+import { file } from "tmp-promise";
+import {extractOperationIdFromSpecificationFile, fixSpecificationFile, generateSourcesFromSpecification} from "./utils";
 
-import {copyDir, createTempDir, execute, fileExists} from "./utils";
+program
+    .option("-i, --input <file>", "input file")
+    .option("-o, --output <directory>", "output file")
+    .option("-m, --method <name>", "operationId of method to extract")
+    .option("-f, --force", "overwrite existing output directory")
+    .option("-v, --validate", "perform validation of input file");
 
-const parsedArgs = minimist(process.argv.slice(2));
+program.parse(process.argv);
 
-if (!parsedArgs.i) {
+if (!program.input) {
     console.error("[Error] Required option '-i' is missing.");
     process.exit(1);
 }
 
-if (!parsedArgs.o) {
+if (!program.output) {
     // tslint:disable-next-line:no-console
     console.error("[Error] Required option '-o' is missing.");
     process.exit(1);
@@ -20,47 +27,44 @@ if (!parsedArgs.o) {
 
 let force = false;
 
-if (parsedArgs.f) {
+if (program.force) {
     force = true;
 }
 
 let validate = false;
 
-if (parsedArgs.v) {
+if (program.validate) {
     validate = true;
 }
 
-const inputFile = path.join(process.cwd(), parsedArgs.i);
-const outputDir = path.join(process.cwd(), parsedArgs.o);
+const inputFile = path.join(process.cwd(), program.input);
+const outputDir = path.join(process.cwd(), program.output);
+
+const generatorBinary = `${__dirname}/../node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator`;
 
 async function main(): Promise<void> {
     try {
-        if (!await fileExists(inputFile)) {
-            console.error(`[Error] The input file '${inputFile}' does not exist.`);
-            process.exit(2);
-        }
+        const fixedSpecificationFile = await file();
 
-        if (!force && await fileExists(outputDir)) {
-            console.error(`[Error] The output directory '${outputDir}' already exist.`);
-            process.exit(3);
-        }
+        await fixSpecificationFile(inputFile, fixedSpecificationFile.path);
 
-        if (validate) {
-            try {
-                await execute(`openapi-generator validate -i ${inputFile}`);
-            } catch (err) {
-                console.error(`[Error] The input file '${inputFile}' failed validation.`);
-                process.exit(4);
-            }
-        }
+        const singleOperationSpecificationFile = await file();
 
-        const tempDir = await createTempDir("openapi-tg");
+        await extractOperationIdFromSpecificationFile(
+            fixedSpecificationFile.path,
+            singleOperationSpecificationFile.path,
+            "retrieveBillingAccount",
+        );
 
-        await execute(`openapi-generator generate -g typescript-node -i ${inputFile} -o ${tempDir}`);
-
-        await copyDir(path.join(tempDir, "model"), outputDir);
+        await generateSourcesFromSpecification(
+            generatorBinary,
+            singleOperationSpecificationFile.path,
+            outputDir,
+            force,
+            validate,
+        );
     } catch (err) {
-        console.error(err);
+        console.log(err);
     }
 }
 
