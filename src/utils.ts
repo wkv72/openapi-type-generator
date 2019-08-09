@@ -1,11 +1,14 @@
+import {exec} from "child_process";
 import fs from "fs";
 import {ncp} from "ncp";
 import tmp from "tmp";
 import util from "util";
 
+tmp.setGracefulCleanup();
+
 const fileExists = util.promisify(fs.exists);
 
-const tmpDir = (prefix: string): Promise<string> => {
+const createTempDir = (prefix: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         tmp.dir({prefix}, (err, tempDir) => {
             if (err) {
@@ -29,4 +32,16 @@ const copyDir = (source: string, destination: string) => {
     });
 };
 
-export {fileExists, tmpDir, copyDir};
+const execute = (command: string) => {
+    return new Promise((resolve, reject) => {
+        exec(command, (err, stdout, stderr) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+};
+
+export {fileExists, createTempDir, copyDir, execute};

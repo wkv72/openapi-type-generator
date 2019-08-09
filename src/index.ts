@@ -3,9 +3,7 @@
 import minimist = require("minimist");
 import path from "path";
 
-import {copyDir, fileExists, tmpDir} from "./utils";
-
-import {spawn} from "child_process";
+import {copyDir, createTempDir, execute, fileExists} from "./utils";
 
 const parsedArgs = minimist(process.argv.slice(2));
 
@@ -20,54 +18,27 @@ if (!parsedArgs.o) {
     process.exit(1);
 }
 
-const inputFile = parsedArgs.i;
-const inputFileRelativeToCode = path.join(process.cwd(), inputFile);
-console.log(inputFileRelativeToCode);
-
-const outputDir = parsedArgs.o;
-const outputDirRelativeToCode = path.join(process.cwd(), outputDir);
-console.log(outputDirRelativeToCode);
+const inputFile = path.join(process.cwd(), parsedArgs.i);
+const outputDir = path.join(process.cwd(), parsedArgs.o);
 
 async function main(): Promise<void> {
-    if (!await fileExists(inputFileRelativeToCode)) {
-        console.error(`Input file '${inputFile}' does not exist.`);
-        process.exit(2);
+    try {
+        if (!await fileExists(inputFile)) {
+            console.error(`Input file '${inputFile}' does not exist.`);
+            process.exit(2);
+        }
+
+        if (await fileExists(outputDir)) {
+            console.error(`Output directory '${outputDir}' already exist.`);
+            process.exit(3);
+        }
+
+        const tempDir = await createTempDir("openapi-tg");
+
+        await execute(`openapi-generator generate -g typescript-node -i ${inputFile} -o ${tempDir}`);
+    } catch (err) {
+        console.error(err);
     }
-
-    if (await fileExists(outputDirRelativeToCode)) {
-        console.error(`Output directory '${outputDir}' already exist.`);
-        process.exit(3);
-    }
-
-    const tempDir = await tmpDir("openapi-tg");
-
-    process.env.OPENAPI_TG_INPUT = inputFile;
-    process.env.OPENAPI_TG_OUTPUT = tempDir;
-    process.env.OPENAPI_TG_ADDITIONAL_PROPERTIES = "supportsES6=true";
-
-    const generate = spawn("openapi-generator", [
-        "generate",
-        "-g",
-        "typescript-node",
-        "-i",
-        `${inputFileRelativeToCode}`,
-        "-o",
-        `${outputDirRelativeToCode}`,
-    ]);
-
-    generate.stdout.on("data", (data) => {
-        // console.log(`stdout: ${data}`);
-    });
-
-    generate.stderr.on("data", (data) => {
-        // console.log(`stderr: ${data}`);
-    });
-
-    generate.on("close", (code) => {
-        console.log(`child process exited with code ${code}`);
-    });
-
-    await copyDir(path.join(tempDir, "model"), outputDirRelativeToCode);
 }
 
 main();
