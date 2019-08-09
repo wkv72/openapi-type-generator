@@ -45,7 +45,7 @@ if (commander_1.default.validate) {
 }
 const inputFile = path_1.default.join(process.cwd(), commander_1.default.input);
 const outputDir = path_1.default.join(process.cwd(), commander_1.default.output);
-const generatorBinary = `${__dirname}/../node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator`;
+const generatorBinary = `${__dirname}/node_modules/@openapitools/openapi-generator-cli/bin/openapi-generator`;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
