@@ -3,7 +3,11 @@
 import program from "commander";
 import path from "path";
 import { file } from "tmp-promise";
-import {extractOperationIdFromSpecificationFile, fixSpecificationFile, generateSourcesFromSpecification} from "./utils";
+import {
+    extractOperationIdFromSpecificationFile,
+    fixSpecificationFile,
+    generateSourcesFromSpecification
+} from "./utils";
 
 program
     .option("-i, --input <file>", "input file")
