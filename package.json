@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate": "openapi-generator generate -g typescript-node --additional-properties=\"$OPENAPI_TG_ADDITIONAL_PROPERTIES\" -i $OPENAPI_TG_INPUT -o $OPENAPI_TG_OUTPUT >/dev/null 2>/dev/null"
   },
