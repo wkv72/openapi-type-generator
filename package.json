@@ -15,7 +15,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "0.0.16-4.0.3",
     "@types/commander": "^2.12.2",
     "@types/minimist": "^1.2.0",
     "@types/ncp": "^2.0.1",
@@ -27,6 +26,7 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
+    "@openapitools/openapi-generator-cli": "0.0.16-4.0.3",
     "commander": "^3.0.0",
     "ncp": "^2.0.0",
     "omit-deep": "^0.3.0",
