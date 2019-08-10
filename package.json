@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "prebuild": "rimraf dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "generate": "openapi-generator generate -g typescript-node --additional-properties=\"$OPENAPI_TG_ADDITIONAL_PROPERTIES\" -i $OPENAPI_TG_INPUT -o $OPENAPI_TG_OUTPUT >/dev/null 2>/dev/null"
   },
@@ -20,6 +21,7 @@
     "@types/node": "^12.7.1",
     "@types/tmp": "^0.1.0",
     "@types/yaml": "^1.0.2",
+    "rimraf": "^2.6.3",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
   },
